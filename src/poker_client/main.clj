@@ -6,21 +6,23 @@
   (:use [clojure.tools.logging :as log]))
 
 (defn -main []
-  (println "hello world!"))
+  (connect {:name "poker.cygni.se" :port 4711}))
 
 (def json-delimiter "_-^emil^-_")
 
 (defn write [conn msg]
-  (println (str "Printing " msg))
   (doto (:out @conn)
     (.println (str msg "\r"))
     (.flush)))
+
+(defn strip-end [s word]
+  (.substring s 0 (- (count s) (count word))))
 
 (defn read-till-delimiter
   ([in delimiter] (read-till-delimiter in delimiter ""))
   ([in delimiter input]
    (if (.endsWith input delimiter)
-     input
+     (strip-end input delimiter)
      (let [character (.read in)]
        (if (< character 0)
          input
@@ -41,7 +43,7 @@
 (defn conn-handler [conn]
   (do
     (write conn register-for-play)
-    (println (str "Input: " (read-till-delimiter
+    (println (str "Response " (read-till-delimiter
                              (:in @conn)
                              json-delimiter)))))
 
@@ -52,5 +54,3 @@
         conn (ref {:in in :out out})]
     (doto (Thread. #(conn-handler conn)) (.start))
     conn))
-
-(connect {:name "poker.cygni.se" :port 4711})
