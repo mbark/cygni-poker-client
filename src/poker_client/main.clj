@@ -5,10 +5,13 @@
   (:require [clojure.data.json :as json])
   (:use [clojure.tools.logging :as log]))
 
+(declare connect)
+
 (defn -main []
-  (println "hello world!"))
+  (connect {:name "poker.cygni.se" :port 4711}))
 
 (def json-delimiter "_-^emil^-_")
+(def poker-bot-name "clojure-test2")
 
 (defn write [conn msg]
   (doto (:out @conn)
@@ -36,18 +39,26 @@
    (json/write-str
     {:type "se.cygni.texasholdem.communication.message.request.RegisterForPlayRequest"
      :sessionId ""
-     :name "clojure-test"
+     :name poker-bot-name
      :room "TRAINING"})
    json-delimiter))
+
+(defn is-done? [response]
+  (or
+   (empty? response)
+   (= "se.cygni.texasholdem.communication.message.exception.UsernameAlreadyTakenException" (response "type"))))
 
 (defn conn-handler [conn]
   (do
     (write conn register-for-play)
-    (let [raw-response (read-till-delimiter
-                             (:in @conn)
-                             json-delimiter)
-          response (json/read-str raw-response)]
-      (info (str "Received response " response)))))
+    (while (nil? (:exit @conn))
+      (let [raw-response (read-till-delimiter
+                          (:in @conn)
+                          json-delimiter)
+            response (json/read-str raw-response)]
+        (info (str "Received response " response))
+        (if (is-done? response)
+          (dosync (alter conn merge {:exit true})))))))
 
 (defn connect [server]
   (let [socket (Socket. (:name server) (:port server))
@@ -56,5 +67,3 @@
         conn (ref {:in in :out out})]
     (doto (Thread. #(conn-handler conn)) (.start))
     conn))
-
-(connect {:name "poker.cygni.se" :port 4711})
