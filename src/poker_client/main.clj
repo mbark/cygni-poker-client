@@ -3,7 +3,8 @@
   (:import (java.net Socket)
            (java.io PrintWriter InputStreamReader BufferedReader))
   (:require [clojure.data.json :as json])
-  (:use [clojure.tools.logging :as log]))
+  (:use [clojure.tools.logging :as log]
+        [clojure.set]))
 
 (declare connect)
 
@@ -11,7 +12,7 @@
   (connect {:name "poker.cygni.se" :port 4711}))
 
 (def json-delimiter "_-^emil^-_")
-(def poker-bot-name "clojure-test2")
+(def poker-bot-name "clojure-client")
 
 (defn write [conn msg]
   (doto (:out @conn)
@@ -46,7 +47,40 @@
 (defn is-done? [response]
   (or
    (empty? response)
-   (= "se.cygni.texasholdem.communication.message.exception.UsernameAlreadyTakenException" (response "type"))))
+   (= "se.cygni.texasholdem.communication.message.exception.UsernameAlreadyTakenException" (response :type))))
+
+(defn keyify-actions [actions]
+  (map
+   (fn [action]
+     (update-in
+      (rename-keys action {"actionType" :action-type
+                           "amount" :amount})
+      [:action-type]
+      #({"FOLD" :fold
+         "CALL" :call
+         "ALL_IN" :all-in
+         "RAISE" :raise}
+                %)))
+   actions))
+
+(defn parse-action-request [json]
+  (let [keys-renamed (rename-keys json
+                                  {"type" :type
+                                   "version" :version
+                                   "sessionId" :session-id
+                                   "requestId" :request-id
+                                   "possibleActions" :possible-actions})]
+    (if (contains? keys-renamed :possible-actions)
+      (update-in
+       keys-renamed
+       [:possible-actions]
+       keyify-actions)
+      keys-renamed)))
+
+(defn json-map->clj-map [json]
+  (case (json "type")
+    "se.cygni.texasholdem.communication.message.request.ActionRequest" (parse-action-request json)
+    json))
 
 (defn conn-handler [conn]
   (do
@@ -55,7 +89,7 @@
       (let [raw-response (read-till-delimiter
                           (:in @conn)
                           json-delimiter)
-            response (json/read-str raw-response)]
+            response (json-map->clj-map (json/read-str raw-response))]
         (info (str "Received response " response))
         (if (is-done? response)
           (dosync (alter conn merge {:exit true})))))))
