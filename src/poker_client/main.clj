@@ -2,16 +2,10 @@
   (:gen-class)
   (:use [clojure.tools.logging :as log]
         [camel-snake-kebab]
-        [poker-client socket routing player-bot]))
+        [poker-client socket routing player-bot responses]))
 
 (def poker-bot-name "clojure-client")
 (def poker-bot (->LoggingBot))
-
-(def register-for-play
-  {:type "se.cygni.texasholdem.communication.message.request.RegisterForPlayRequest"
-   :sessionId ""
-   :name poker-bot-name
-   :room "TRAINING"})
 
 (defn- done? [response]
   (or
@@ -48,7 +42,7 @@
 
 (defn start-client [server]
   (let [conn (connect server)]
-    (respond conn register-for-play)
+    (respond conn (->map (->RegisterForPlay poker-bot)))
     (doto (Thread. #(event-handler conn)) (.start))))
 
 (defn -main []
