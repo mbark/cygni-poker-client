@@ -1,6 +1,7 @@
 (ns poker-client.main
   (:gen-class)
   (:use [clojure.tools.logging :as log]
+        [camel-snake-kebab]
         [poker-client socket]))
 
 (def poker-bot-name "clojure-client")
@@ -14,21 +15,33 @@
 (defn- done? [response]
   (or
    (empty? response)
-   (= "se.cygni.texasholdem.communication.message.exception.UsernameAlreadyTakenException" (response :type))))
+   (= "UsernameAlreadyTakenException" (response :type))))
 
-(defn- json-map->clj-map [json]
+(defn- json-keys->keyword [json]
   (into
    {}
    (for [[k v] json]
-     [(keyword k)
+     [(keyword (->kebab-case k))
       (cond
-       (vector? v) (map json-map->clj-map v)
-       (map? v) (json-map->clj-map v)
+       (vector? v) (map json-keys->keyword v)
+       (map? v) (json-keys->keyword v)
        :else v)])))
+
+(defn- type-class [data]
+  (last
+   (clojure.string/split
+    (:type data)
+    #"\.")))
+
+(defn- ->clj-map [json]
+  (let [m (json-keys->keyword json)]
+    (assoc m :type (type-class m))))
+
+(assoc {:a 3} :a 2)
 
 (defn- event-handler [conn]
   (while (nil? (:exit @conn))
-    (let [event (json-map->clj-map (next-event conn))]
+    (let [event (->clj-map (next-event conn))]
       (info (str "Received event " event))
       (if (done? event)
         (dosync (alter conn merge {:exit true}))))))
