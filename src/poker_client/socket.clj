@@ -7,6 +7,7 @@
 (def json-delimiter "_-^emil^-_")
 
 (defn- write-map [conn msg]
+  (info (str "Writing " msg))
   (doto (:out @conn)
     (.println (str msg "\r"))
     (.flush)))
@@ -28,9 +29,9 @@
           (str input (char character))))))))
 
 (defn respond [conn data]
-  (info (str "Writing response " data))
-  (write-map conn
-             (str (json/write-str data) json-delimiter)))
+  (write-map
+   conn
+   (str (json/write-str data) json-delimiter)))
 
 (defn next-event [conn]
   (json/read-str

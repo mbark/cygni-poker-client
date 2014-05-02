@@ -38,11 +38,12 @@
       (info (str "Received event " event))
       (if (done? event)
         (dosync (alter conn merge {:exit true}))
-        (route event poker-bot)))))
+        (when-let [action (route event poker-bot)]
+          (respond conn (->map action)))))))
 
 (defn start-client [server]
   (let [conn (connect server)]
-    (respond conn (->map (->RegisterForPlay poker-bot)))
+    (respond conn (->map (->RegisterForPlay (bot-name poker-bot))))
     (doto (Thread. #(event-handler conn)) (.start))))
 
 (defn -main []

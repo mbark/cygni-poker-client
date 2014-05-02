@@ -1,5 +1,6 @@
 (ns poker-client.player-bot
-  (:use [clojure.tools.logging :as log]))
+  (:use [clojure.tools.logging :as log]
+        [poker-client responses]))
 
 (defprotocol PlayerBot
   (bot-name [_])
@@ -10,4 +11,5 @@
   (bot-name [_] "clojure-client")
   (action-request
    [this request]
-   (info "Request to act")))
+   (info (str "Request: " request))
+   (->Action (:request-id request))))
