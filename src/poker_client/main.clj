@@ -2,9 +2,10 @@
   (:gen-class)
   (:use [clojure.tools.logging :as log]
         [camel-snake-kebab]
-        [poker-client socket]))
+        [poker-client socket routing player-bot]))
 
 (def poker-bot-name "clojure-client")
+(def poker-bot (->LoggingBot))
 
 (def register-for-play
   {:type "se.cygni.texasholdem.communication.message.request.RegisterForPlayRequest"
@@ -37,14 +38,13 @@
   (let [m (json-keys->keyword json)]
     (assoc m :type (type-class m))))
 
-(assoc {:a 3} :a 2)
-
 (defn- event-handler [conn]
   (while (nil? (:exit @conn))
     (let [event (->clj-map (next-event conn))]
       (info (str "Received event " event))
       (if (done? event)
-        (dosync (alter conn merge {:exit true}))))))
+        (dosync (alter conn merge {:exit true}))
+        (route event poker-bot)))))
 
 (defn start-client [server]
   (let [conn (connect server)]
