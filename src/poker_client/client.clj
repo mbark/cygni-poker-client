@@ -1,4 +1,4 @@
-(ns poker-client.main
+(ns poker-client.client
   (:gen-class)
   (:require [clojure.tools.logging :refer [info]]
             [camel-snake-kebab :refer [->kebab-case]]
@@ -47,7 +47,7 @@
             (send-msg conn (msg/action-response (:request-id event) action))))))
     (catch Exception e (exit conn))))
 
-(defn start-client [server bot]
+(defn start [server bot]
   (let [conn (connect server)]
     (send-msg conn
               (msg/register-for-play (bot-name bot)))
