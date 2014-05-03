@@ -13,7 +13,3 @@
         (info (str "Found " fun " for event " (:type event)))
         (fun bot event))
       (info "No function found " full-name))))
-
-(def fns ["RegisterForPlayResponse" "PlayIsStartedEvent" "CommunityHasBeenDealtACardEvent" "PlayerBetBigBlindEvent" "PlayerBetSmallBlindEvent" "PlayerCalledEvent" "PlayerCheckedEvent" "PlayerFoldedEvent" "PlayerForcedFoldedEvent" "PlayerQuitEvent" "PlayerRaisedEvent" "PlayerWentAllInEvent" "ServerIsShuttingDownEvent" "ShowDownEvent" "TableChangedStateEvent" "TableIsDoneEvent" "YouHaveBeenDealtACardEvent" "YouWonAmountEvent"])
-
-(map (comp symbol ->kebab-case) fns)
