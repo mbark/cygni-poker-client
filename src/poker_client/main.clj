@@ -1,8 +1,11 @@
 (ns poker-client.main
   (:gen-class)
-  (:use [clojure.tools.logging :as log]
-        [camel-snake-kebab]
-        [poker-client socket routing player-bot responses]))
+  (:require [clojure.tools.logging :refer [info]]
+            [camel-snake-kebab :refer [->kebab-case]]
+            [poker-client.socket :refer [connect respond next-event]]
+            [poker-client.routing :refer [route]]
+            [poker-client.player-bot :refer [->LoggingBot bot-name]]
+            [poker-client.responses :refer [->map ->RegisterForPlay]]))
 
 (def poker-bot-name "clojure-client")
 (def poker-bot (->LoggingBot))
@@ -32,14 +35,20 @@
   (let [m (json-keys->keyword json)]
     (assoc m :type (type-class m))))
 
+(defn- exit [conn]
+  (info "Shutting down")
+  (dosync (alter conn merge {:exit true})))
+
 (defn- event-handler [conn]
-  (while (nil? (:exit @conn))
-    (let [event (->clj-map (next-event conn))]
-      (info (str "Received event " event))
-      (if (done? event)
-        (dosync (alter conn merge {:exit true}))
-        (when-let [action (route event poker-bot)]
-          (respond conn (->map action)))))))
+  (try
+    (while (nil? (:exit @conn))
+      (let [event (->clj-map (next-event conn))]
+        (info (str "Received event " event))
+        (if (done? event)
+          (exit conn)
+          (when-let [action (route event poker-bot)]
+            (respond conn (->map action))))))
+    (catch Exception e (exit conn))))
 
 (defn start-client [server]
   (let [conn (connect server)]

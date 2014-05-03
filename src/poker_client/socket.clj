@@ -1,8 +1,8 @@
 (ns poker-client.socket
   (:import [java.net Socket]
            [java.io PrintWriter InputStreamReader BufferedReader])
-  (:require [clojure.data.json :as json])
-  (:use [clojure.tools.logging :as log]))
+  (:require [clojure.data.json :as json :refer [read-str write-str]]
+            [clojure.tools.logging :refer [info]]))
 
 (def json-delimiter "_-^emil^-_")
 

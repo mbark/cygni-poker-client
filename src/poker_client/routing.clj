@@ -1,7 +1,7 @@
 (ns poker-client.routing
-  (:use [clojure.tools.logging :as log]
-        [camel-snake-kebab]
-        [poker-client player-bot]))
+  (:require [clojure.tools.logging :refer [info]]
+          [camel-snake-kebab :refer [->kebab-case]]
+          [poker-client.player-bot :refer :all]))
 
 (defn- find-fn-by-name [^String nm]
   (ns-resolve *ns* (symbol nm)))

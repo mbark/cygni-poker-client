@@ -1,6 +1,6 @@
 (ns poker-client.player-bot
-  (:use [clojure.tools.logging :as log]
-        [poker-client responses]))
+  (:require [clojure.tools.logging :refer [info]]
+          [poker-client.responses :refer [->Action]]))
 
 (defprotocol PlayerBot
   (bot-name [_])

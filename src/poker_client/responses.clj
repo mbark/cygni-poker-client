@@ -1,6 +1,6 @@
 (ns poker-client.responses
-  (:require [clojure.data.json :as json])
-  (:use [clojure.tools.logging :as log]))
+  (:require [clojure.data.json :as json]
+            [clojure.tools.logging :refer [info]]))
 
 (defprotocol Response
   (->map [this]))
