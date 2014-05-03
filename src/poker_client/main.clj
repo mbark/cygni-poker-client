@@ -2,10 +2,10 @@
   (:gen-class)
   (:require [clojure.tools.logging :refer [info]]
             [camel-snake-kebab :refer [->kebab-case]]
-            [poker-client.socket :refer [connect respond next-event]]
+            [poker-client.socket :refer [connect send-msg next-event]]
             [poker-client.routing :refer [route]]
             [poker-client.player-bot :refer [->LoggingBot bot-name]]
-            [poker-client.responses :refer [->map ->RegisterForPlay]]))
+            [poker-client.messages :as msg :refer [register-for-play]]))
 
 (defn- done? [response]
   (or
@@ -44,12 +44,13 @@
         (if (done? event)
           (exit conn)
           (when-let [action (route event bot)]
-            (respond conn (->map action))))))
+            (send-msg conn (msg/action-response (:request-id event) action))))))
     (catch Exception e (exit conn))))
 
 (defn start-client [server bot]
   (let [conn (connect server)]
-    (respond conn (->map (->RegisterForPlay (bot-name bot))))
+    (send-msg conn
+              (msg/register-for-play (bot-name bot)))
     (doto (Thread. #(event-handler conn bot)) (.start))))
 
 (defn -main []

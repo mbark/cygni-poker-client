@@ -1,6 +1,5 @@
 (ns poker-client.player-bot
-  (:require [clojure.tools.logging :refer [info]]
-            [poker-client.responses :refer [->Action]]))
+  (:require [clojure.tools.logging :refer [info]]))
 
 (defprotocol PlayerBot
   (bot-name [_])
@@ -30,7 +29,7 @@
   (action-request
    [this request]
    (info (str "Request: " request))
-   (->Action (:request-id request)))
+   {"actionType" "FOLD" "amount" 0})
   (register-for-play-response
    [this event]
    (info (str "Bot received event " event)))
