@@ -1,6 +1,5 @@
 (ns poker-client.messages
-  (:require [clojure.data.json :as json]
-            [clojure.tools.logging :refer [info]]))
+  (:require [clojure.tools.logging :refer [info]]))
 
 (defn register-for-play [bot-name]
   {:type "se.cygni.texasholdem.communication.message.request.RegisterForPlayRequest"

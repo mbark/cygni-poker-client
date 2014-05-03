@@ -4,7 +4,7 @@
             [camel-snake-kebab :refer [->kebab-case]]
             [poker-client.socket :refer [connect send-msg next-event]]
             [poker-client.routing :refer [route]]
-            [poker-client.player-bot :refer [->LoggingBot bot-name]]
+            [poker-client.player :refer [bot-name]]
             [poker-client.messages :as msg :refer [register-for-play]]))
 
 (defn- done? [response]
@@ -52,6 +52,3 @@
     (send-msg conn
               (msg/register-for-play (bot-name bot)))
     (doto (Thread. #(event-handler conn bot)) (.start))))
-
-(defn -main []
-  (start-client {:name "poker.cygni.se" :port 4711} (->LoggingBot)))
