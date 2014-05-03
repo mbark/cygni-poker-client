@@ -7,7 +7,6 @@
             [poker-client.player-bot :refer [->LoggingBot bot-name]]
             [poker-client.responses :refer [->map ->RegisterForPlay]]))
 
-(def poker-bot-name "clojure-client")
 (def poker-bot (->LoggingBot))
 
 (defn- done? [response]
