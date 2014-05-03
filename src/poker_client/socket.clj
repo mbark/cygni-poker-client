@@ -1,8 +1,8 @@
 (ns poker-client.socket
   (:import [java.net Socket]
            [java.io PrintWriter InputStreamReader BufferedReader])
-  (:require [clojure.data.json :as json :refer [read-str write-str]]
-            [clojure.tools.logging :refer [info]]))
+  (:require [clojure.tools.logging :refer [info]]
+            [poker-client.message :refer [->str]]))
 
 (def json-delimiter "_-^emil^-_")
 
@@ -28,14 +28,13 @@
           delimiter
           (str input (char character))))))))
 
-(defn send-msg [conn m]
+(defn send-msg [conn msg]
   (write
    conn
-   (str (json/write-str m) json-delimiter)))
+   (str (->str msg) json-delimiter)))
 
-(defn next-event [conn]
-  (json/read-str
-   (read-till-delimiter (:in @conn) json-delimiter)))
+(defn read-msg [conn]
+   (read-till-delimiter (:in @conn) json-delimiter))
 
 (defn connect [server]
   (let [socket (Socket. (:name server) (:port server))
