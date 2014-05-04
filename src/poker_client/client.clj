@@ -2,7 +2,7 @@
   (:gen-class)
   (:require [clojure.tools.logging :refer [info error]]
             [poker-client.socket :refer [connect send-msg read-msg]]
-            [poker-client.routing :refer [route]]
+            [poker-client.router :refer [route]]
             [poker-client.player :refer [bot-name]]
             [poker-client.message :refer [->RegisterForPlay ->ActionResponse]]
             [poker-client.event :refer [msg->event-map]]))

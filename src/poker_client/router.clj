@@ -1,4 +1,4 @@
-(ns poker-client.routing
+(ns poker-client.router
   (:require [clojure.tools.logging :refer [info]]
             [camel-snake-kebab :refer [->kebab-case]]
             [poker-client.player :refer :all]))

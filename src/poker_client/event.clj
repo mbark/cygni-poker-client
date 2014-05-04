@@ -3,14 +3,14 @@
             [camel-snake-kebab :refer [->kebab-case]]
             [clojure.data.json :as json :refer [read-str]]))
 
-(defn- json-keys->keyword [json]
+(defn- ->keywords [json]
   (into
    {}
    (for [[k v] json]
      [(keyword (->kebab-case k))
       (cond
-       (vector? v) (map json-keys->keyword v)
-       (map? v) (json-keys->keyword v)
+       (vector? v) (map ->keywords v)
+       (map? v) (->keywords v)
        :else v)])))
 
 (defn- event-class [data]
@@ -20,7 +20,7 @@
     #"\.")))
 
 (defn- ->clj-map [json]
-  (let [m (json-keys->keyword json)]
+  (let [m (->keywords json)]
     (assoc m :type (event-class m))))
 
 (defn msg->event-map [msg]
