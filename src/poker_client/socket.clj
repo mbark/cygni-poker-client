@@ -1,7 +1,7 @@
 (ns poker-client.socket
   (:import [java.net Socket]
-           [java.io PrintWriter InputStreamReader BufferedReader])
-  (:require [clojure.tools.logging :refer [info]]
+           [java.io PrintWriter InputStreamReader BufferedReader EOFException])
+  (:require [clojure.tools.logging :refer [info error]]
             [poker-client.message :refer [->str]]))
 
 (def json-delimiter "_-^emil^-_")
@@ -21,8 +21,7 @@
    (if (.endsWith input delimiter)
      (strip-end input delimiter)
      (let [character (.read in)]
-       (if (< character 0)
-         input
+       (if (>= character 0)
          (read-till-delimiter
           in
           delimiter
@@ -34,7 +33,12 @@
    (str (->str msg) json-delimiter)))
 
 (defn read-msg [conn]
-   (read-till-delimiter (:in @conn) json-delimiter))
+  (try
+    (read-till-delimiter (:in @conn) json-delimiter)
+    (catch EOFException e
+      (info "End of file encountered"))
+    (catch Exception e
+      (error e "Exception when reading from socket"))))
 
 (defn connect [server]
   (let [socket (Socket. (:name server) (:port server))

@@ -3,14 +3,10 @@
             [clojure.data.json :as json :refer [write-str]]))
 
 (defprotocol IMessage
-  (->str [this])
   (->map [this]))
 
 (defrecord RegisterForPlay [bot-name]
   IMessage
-  (->str
-   [this]
-   (json/write-str (->map this)))
   (->map
    [_]
    {:type "se.cygni.texasholdem.communication.message.request.RegisterForPlayRequest"
@@ -20,9 +16,11 @@
 
 (defrecord ActionResponse [id action]
   IMessage
-  (->str [this] (json/write-str (->map this)))
   (->map
    [_]
    {:type "se.cygni.texasholdem.communication.message.response.ActionResponse"
     :requestId id
     :action action}))
+
+(defn ->str [msg]
+  (json/write-str (->map msg)))

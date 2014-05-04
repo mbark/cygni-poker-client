@@ -23,11 +23,5 @@
   (let [m (json-keys->keyword json)]
     (assoc m :type (event-class m))))
 
-(defn msg->map [msg]
+(defn msg->event-map [msg]
   (->clj-map (json/read-str msg)))
-
-
-;;(defn- done? [response]
-;;  (or
-;;   (empty? response)
-;;   (= "UsernameAlreadyTakenException" (response :type))))
