@@ -1,5 +1,4 @@
 (ns poker-client.client
-  (:gen-class)
   (:require [clojure.tools.logging :refer [info error]]
             [poker-client.socket :refer [connect send-msg read-msg]]
             [poker-client.router :refer [route]]
