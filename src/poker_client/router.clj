@@ -1,13 +1,19 @@
 (ns poker-client.router
   (:require [clojure.tools.logging :refer [info]]
             [camel-snake-kebab :refer [->kebab-case]]
-            [poker-client.player :refer :all]))
+            [poker-client.player :refer :all]
+            [poker-client.event-listener :refer :all]))
 
-(defn- find-fn-by-name [^String nm]
+(defn- matching-fn [^String nm]
   (ns-resolve *ns* (symbol nm)))
+
+(defn- event-listener-in [fn-namespace event]
+  (matching-fn
+   (str "poker-client." fn-namespace "/" (->kebab-case (:type event)))))
 
 (defn route [event bot]
   (info (str "Searching for matching function for event " (:type event)))
-  (let [full-name (str "poker-client.player/" (->kebab-case (:type event)))]
-    (if-let [fun (find-fn-by-name full-name)]
-      (fun bot event))))
+  (if-let [fun (or
+                (event-listener-in "player" event)
+                (event-listener-in "event-listener" event))]
+    (fun bot event)))

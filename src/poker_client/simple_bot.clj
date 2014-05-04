@@ -1,6 +1,7 @@
 (ns poker-client.simple-bot
   (:require [clojure.tools.logging :refer [info]]
             [poker-client.player :refer [IPlayer]]
+            [poker-client.event-listener :refer [IEventListener]]
             [poker-client.client :as client :refer [start]]))
 
 (declare ->SimpleBot)
@@ -9,7 +10,7 @@
   (client/start {:name "poker.cygni.se" :port 4711} (->SimpleBot)))
 
 (defrecord SimpleBot []
-  IPlayer
+  IPlayer IEventListener
   (bot-name [_] "clojure-client")
   (action-request
    [this request]
