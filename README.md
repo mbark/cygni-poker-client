@@ -1,14 +1,35 @@
 # poker-client
 
-A Clojure library designed to ... well, that part is up to you.
+A client to handle the connection to Cygni's [Texas hold'em Botgame](https://github.com/emilb/texas-holdem-botgame).
 
-## Usage
+## Using the client
 
-FIXME
+To run it you need [Leiningen](http://leiningen.org/).
 
-## License
+    #download all depndencies
+    lein deps
 
-Copyright © 2014 FIXME
+    #run the project
+    lein run
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+This will start the client, and you will see log output.
+
+## Writing your bot
+
+The example bot used is [simple-bot](https://github.com/mbark/cygni-poker-client/blob/master/src/poker_client/simple_bot.clj). To write your own bot you need to to change the main class in [project.clj](https://github.com/mbark/cygni-poker-client/blob/master/project.clj)
+
+```clojure
+(defproject poker-client "0.1.0-SNAPSHOT"
+;; bunch of stuff here
+  :main poker-client.simple-bot ;; set to your own bot
+;; more stuff here
+```
+
+Then in your bot you just add a main function
+
+```clojure
+(defn -main []
+  (client/start {:name "poker.cygni.se" :port 4711} (->SimpleBot)))
+```
+
+Change port or name as necessary.
