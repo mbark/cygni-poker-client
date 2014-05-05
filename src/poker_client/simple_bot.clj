@@ -14,7 +14,7 @@
   (bot-name [_] "clojure-client")
   (action-response
    [this request]
-   (info (str "Request: " request))
+   (info (str "Bot received request " request))
    {"actionType" "FOLD" "amount" 0})
   (register-for-play-response
    [this event])

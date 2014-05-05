@@ -1,8 +1,9 @@
 (ns poker-client.client
-  (:require [clojure.tools.logging :refer [info error]]
+  (:require [clojure.tools.logging :refer [info error debug]]
             [poker-client.socket :refer [connect send-msg read-msg]]
             [poker-client.router :refer [route]]
             [poker-client.player :refer [bot-name action-response]]
+            [poker-client.board-state :refer [->BoardUpdater board]]
             [poker-client.message :refer [->RegisterForPlay ->ActionResponse]]
             [poker-client.event :refer [msg->event-map]]))
 
@@ -19,25 +20,27 @@
       true)
     false))
 
-(defn- handle-event [event conn bot]
-  (info (str "Received event from server " event))
+(defn- handle-event [event conn bot board-updater]
+  (debug (str "Received event from server " event))
   (if (invalid? event)
     (exit conn))
-  (if-let [response (route event bot)]
+  (if-let [response (route event bot board-updater)]
     (send-msg
      conn
      (->ActionResponse (:request-id event)
                        (action-response bot event)))))
 
-(defn- handle-events [conn bot]
-  (if-let [msg (read-msg conn)]
-    (do
-      (handle-event (msg->event-map msg) conn bot)
-      (handle-events conn bot))
-    (exit conn)))
+(defn- handle-events [conn bot board-updater]
+  (while true
+    (if-let [msg (read-msg conn)]
+      (do
+        (handle-event (msg->event-map msg) conn bot board-updater)
+        (handle-events conn bot board-updater))
+      (exit conn))))
 
 (defn start [server bot]
-  (let [conn (connect server)]
+  (let [conn (connect server)
+        board-updater (->BoardUpdater)]
     (send-msg conn
               (->RegisterForPlay (bot-name bot)))
-    (doto (Thread. #(handle-events conn bot)) (.start))))
+    (doto (Thread. #(handle-events conn bot board-updater)) (.start))))
