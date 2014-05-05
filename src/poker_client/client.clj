@@ -2,7 +2,7 @@
   (:require [clojure.tools.logging :refer [info error]]
             [poker-client.socket :refer [connect send-msg read-msg]]
             [poker-client.router :refer [route]]
-            [poker-client.player :refer [bot-name]]
+            [poker-client.player :refer [bot-name action-response]]
             [poker-client.message :refer [->RegisterForPlay ->ActionResponse]]
             [poker-client.event :refer [msg->event-map]]))
 
@@ -12,9 +12,6 @@
 
 (defn- exception? [event]
   (= "UsernameAlreadyTakenException" (:type event)))
-
-(defn- requires-response? [event]
-  (= (:type event) "ActionRequest"))
 
 (defn- invalid? [event]
   (if(exception? event)
@@ -26,9 +23,11 @@
   (info (str "Received event from server " event))
   (if (invalid? event)
     (exit conn))
-  (when-let [action (route event bot)]
-    (if (requires-response? event)
-      (send-msg conn (->ActionResponse (:request-id event) action)))))
+  (if-let [response (route event bot)]
+    (send-msg
+     conn
+     (->ActionResponse (:request-id event)
+                       (action-response bot event)))))
 
 (defn- handle-events [conn bot]
   (if-let [msg (read-msg conn)]

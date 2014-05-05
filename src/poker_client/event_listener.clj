@@ -1,6 +1,7 @@
 (ns poker-client.event-listener)
 
 (defprotocol IEventListener
+  (register-for-play-response [this event])
   (play-is-started-event [this event])
   (community-has-been-dealt-a-card-event [this event])
   (player-bet-big-blind-event [this event])

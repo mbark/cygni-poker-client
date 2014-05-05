@@ -12,7 +12,7 @@
 (defrecord SimpleBot []
   IPlayer IEventListener
   (bot-name [_] "clojure-client")
-  (action-request
+  (action-response
    [this request]
    (info (str "Request: " request))
    {"actionType" "FOLD" "amount" 0})

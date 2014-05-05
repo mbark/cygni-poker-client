@@ -2,5 +2,4 @@
 
 (defprotocol IPlayer
   (bot-name [_])
-  (action-request [this request])
-  (register-for-play-response [this event]))
+  (action-response [this request]))
