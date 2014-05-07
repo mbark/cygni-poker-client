@@ -17,7 +17,7 @@
    [this request]
    (info (str "Bot received request " request))
    (info (str "Current board " (current-board)))
-   {"actionType" "FOLD" "amount" 0})
+   (last (:possible-actions request)))
   (register-for-play-response
    [this event])
   (play-is-started-event

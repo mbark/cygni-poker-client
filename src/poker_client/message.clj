@@ -1,6 +1,7 @@
 (ns poker-client.message
   (:require [clojure.tools.logging :refer [info]]
-            [clojure.data.json :as json :refer [write-str]]))
+            [clojure.data.json :as json :refer [write-str]]
+            [camel-snake-kebab :refer [->camelCaseString]]))
 
 (defprotocol IMessage
   (->map [this]))
@@ -23,4 +24,4 @@
     :action action}))
 
 (defn ->str [msg]
-  (json/write-str (->map msg)))
+  (json/write-str (->map msg) :key-fn ->camelCaseString)

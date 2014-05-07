@@ -1,17 +1,7 @@
 (ns poker-client.event
   (:require [clojure.tools.logging :refer [info]]
-            [camel-snake-kebab :refer [->kebab-case]]
+            [camel-snake-kebab :refer [->kebab-case-keyword]]
             [clojure.data.json :as json :refer [read-str]]))
-
-(defn- ->keywords [json]
-  (into
-   {}
-   (for [[k v] json]
-     [(keyword (->kebab-case k))
-      (cond
-       (vector? v) (map ->keywords v)
-       (map? v) (->keywords v)
-       :else v)])))
 
 (defn- event-class [data]
   (last
@@ -19,9 +9,6 @@
     (:type data)
     #"\.")))
 
-(defn- ->clj-map [json]
-  (let [m (->keywords json)]
-    (assoc m :type (event-class m))))
-
 (defn msg->event-map [msg]
-  (->clj-map (json/read-str msg)))
+  (let [m (json/read-str msg :key-fn ->kebab-case-keyword)]
+    (assoc m :type (event-class m))))
