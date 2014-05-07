@@ -3,7 +3,7 @@
             [poker-client.socket :refer [connect send-msg read-msg]]
             [poker-client.router :refer [route]]
             [poker-client.player :refer [bot-name action-response]]
-            [poker-client.board-state :refer [->BoardUpdater board]]
+            [poker-client.board-state :refer [->BoardUpdater]]
             [poker-client.message :refer [->RegisterForPlay ->ActionResponse]]
             [poker-client.event :refer [msg->event-map]]))
 

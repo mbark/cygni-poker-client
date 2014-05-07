@@ -23,6 +23,6 @@
   (if (request? event)
     (action-response bot event)
     (do
-      (route-event event bot)
       (route-event event board-updater)
+      (route-event event bot)
       nil)))

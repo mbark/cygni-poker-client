@@ -2,15 +2,33 @@
   (:require [clojure.tools.logging :refer [info]]
             [poker-client.event-listener :refer [IEventListener]]))
 
-(def ^{:private true} board (atom {}))
+(def ^:private board-state (atom {}))
 
-(defn board-state []
-  @board)
+(defn current-board []
+  @board-state)
+
+(defn- find-first [coll f]
+  (first (filter f coll)))
+
+(defn player [board player-name]
+  (find-first (:players board)
+              #(= (:name %) player-name)))
+
+(defn all-in? [board player-name]
+  (let [player (find-first (:players board)
+                           #(= (:name %) player-name))]
+    (zero? (:chip-count player))))
+
+(defn has-role? [board player-name role]
+  (=
+   (role board)
+   (player board player-name)))
 
 (defn reset-board []
-  (reset! board
+  (reset! board-state
           {:turn nil
            :players []
+           :currently-playing []
            :small-blind 0
            :big-blind 0
            :dealer nil
@@ -18,16 +36,18 @@
            :big-blind-player nil
            :player-cards []
            :community-cards []
-           :pot 0
-           :player-chips 0}))
+           :pot 0}))
+
+(defn remove-player [players player-name]
+  (remove #(= (:name %) player-name) players))
 
 (defn replace-player [players new-player]
-  (let [without-old-player (remove #(= (:name new-player) (:name %)) players)]
-    (conj without-old-player new-player)))
+  (conj (remove-player players (:name new-player))
+        new-player))
 
 (defn update-player [player]
   (swap!
-   board
+   board-state
    (fn [m]
      (update-in m
                 [:players]
@@ -36,11 +56,19 @@
 (defn update-pot [event amount-key]
   (update-player (:player event))
   (swap!
-   board
+   board-state
    (fn [m]
      (update-in m
                 [:pot]
                 #(+ % (amount-key event))))))
+
+(defn player-folded [player]
+  (swap!
+   board-state
+   (fn [m]
+     (update-in m
+                [:currently-playing]
+                #(remove-player % (:name player))))))
 
 (defrecord BoardUpdater []
   IEventListener
@@ -49,10 +77,11 @@
    [this event]
    (reset-board)
    (swap!
-    board
+    board-state
     #(assoc
        %
        :players (:players event)
+       :currently-playing (:players event)
        :small-blind (:small-blind-amount event)
        :big-blind (:big-blind-amount event)
        :dealer (:dealer event)
@@ -61,7 +90,7 @@
   (community-has-been-dealt-a-card-event
    [this event]
    (swap!
-    board
+    board-state
     (fn [m]
       (update-in m
                  [:community-cards]
@@ -69,7 +98,7 @@
   (you-have-been-dealt-a-card-event
    [this event]
    (swap!
-    board
+    board-state
     (fn [m]
       (update-in m
                  [:player-cards]
@@ -94,17 +123,21 @@
   (table-changed-state-event
    [this event]
    (swap!
-    board
+    board-state
     #(assoc % :turn (:state event))))
   (table-is-done-event
    [this event])
   (player-checked-event [this event])
-  (player-folded-event [this event])
-  (player-forced-folded-event [this event])
+  (player-folded-event
+   [this event]
+   (player-folded (:player event)))
+  (player-forced-folded-event
+   [this event]
+   (player-folded (:player event)))
   (player-quit-event [this event])
   (server-is-shutting-down-event [this event])
   (you-won-amount-event
    [this event]
    (swap!
-    board
+    board-state
     #(assoc % :player-chips (:your-chip-amount event)))))

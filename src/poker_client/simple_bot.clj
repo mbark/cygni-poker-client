@@ -2,7 +2,8 @@
   (:require [clojure.tools.logging :refer [info]]
             [poker-client.player :refer [IPlayer]]
             [poker-client.event-listener :refer [IEventListener]]
-            [poker-client.client :as client :refer [start]]))
+            [poker-client.client :as client :refer [start]]
+            [poker-client.board-state :refer [current-board]]))
 
 (declare ->SimpleBot)
 
@@ -15,6 +16,7 @@
   (action-response
    [this request]
    (info (str "Bot received request " request))
+   (info (str "Current board " (current-board)))
    {"actionType" "FOLD" "amount" 0})
   (register-for-play-response
    [this event])
