@@ -1,8 +1,7 @@
 (ns poker-client.socket
   (:import [java.net Socket]
            [java.io PrintWriter InputStreamReader BufferedReader EOFException])
-  (:require [clojure.tools.logging :refer [info error debug]]
-            [poker-client.message :refer [->str]]))
+  (:require [clojure.tools.logging :refer [info error debug]]))
 
 (def json-delimiter "_-^emil^-_")
 
@@ -30,7 +29,7 @@
 (defn send-msg [conn msg]
   (write
    conn
-   (str (->str msg) json-delimiter)))
+   (str msg json-delimiter)))
 
 (defn read-msg [conn]
   (try

@@ -13,7 +13,7 @@
 (defrecord SimpleBot []
   IPlayer IEventListener
   (bot-name [_] "clojure-client")
-  (action-response
+  (play
    [this request]
    (info (str "Bot received request " request))
    (info (str "Current board " (current-board)))
