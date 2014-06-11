@@ -22,7 +22,7 @@
 
 (defn flush?
   [hand]
-  (= 1 (count (group-by :color example-hand))))
+  (= 1 (count (group-by :color hand))))
 
 (defn reduce-some [f coll]
   (not (some nil? (reductions f coll))))
