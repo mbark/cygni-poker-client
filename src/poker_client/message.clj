@@ -15,8 +15,25 @@
      (:type data)
      #"\."))))
 
+(defn- named-rank->num [k v]
+  (if (and (string? v) (= k :rank))
+    ({"DEUCE" 2
+      "THREE" 3
+      "FOUR" 4
+      "FIVE" 5
+      "SIX" 6
+      "SEVEN" 7
+      "EIGHT" 8
+      "NINE" 9
+      "TEN" 10
+      "JACK" 11
+      "QUEEN" 12
+      "KING" 13
+      "ACE" 14} v)
+    v))
+
 (defn msg->map [msg]
-  (let [m (json/read-str msg :key-fn ->kebab-case-keyword)]
+  (let [m (json/read-str msg :key-fn ->kebab-case-keyword :value-fn named-rank->num)]
     (assoc m :type (event-class m))))
 
 (defn request? [msg]

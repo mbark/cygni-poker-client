@@ -1,8 +1,8 @@
 (ns poker-client.util)
 
 (defn group-by-value [hand]
-  (group-by :value
-            (sort-by :value hand)))
+  (group-by :rank
+            (sort-by :rank hand)))
 
 (defn nr-of-a-kind [hand]
   (reduce #(max %1 (count (val %2)))
@@ -22,7 +22,7 @@
 
 (defn flush?
   [hand]
-  (= 1 (count (group-by :color hand))))
+  (= 1 (count (group-by :suit hand))))
 
 (defn reduce-some [f coll]
   (not (some nil? (reductions f coll))))
@@ -30,8 +30,20 @@
 (defn straight?
   [hand]
   (reduce-some
-   #(if (= (inc (:value %1)) (:value %2)) %2)
-   (sort-by :value hand)))
+   #(if (= (inc (:rank %1)) (:rank %2)) %2)
+   (sort-by :rank hand)))
+
+(defn straight-flush? [hand]
+  (and
+   (straight? hand)
+   (flush? hand)))
+
+(defn royal-straight-flush? [hand]
+  (and
+   (straight-flush? hand)
+   (let [ranks (map :rank hand)]
+     (= (apply max ranks) 14)
+     (= (apply min ranks) 10))))
 
 (defn three-of-a-kind?
   [hand]
