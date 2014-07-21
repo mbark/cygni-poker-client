@@ -1,16 +1,13 @@
 (ns poker-client.util)
 
-(defn group-by-value [hand]
+(defn- group-by-value [hand]
   (group-by :rank
             (sort-by :rank hand)))
 
-(defn nr-of-a-kind [hand]
-  (reduce #(max %1 (count (val %2)))
-          0
-          (group-by-value hand)))
-
-(defn n-of-a-kind? [hand n]
-  (= (nr-of-a-kind hand) n))
+(defn- n-of-a-kind? [hand n]
+  (not (nil?
+        (some (fn [[k v]] (= (count v) n))
+              (group-by-value ex-hand)))))
 
 (defn four-of-a-kind?
   [hand]
@@ -18,7 +15,9 @@
 
 (defn full-house?
   [hand]
-  (and (n-of-a-kind? hand 3) (n-of-a-kind? hand 2)))
+  (let [grouped-hand (group-by-value hand)]
+    (and (n-of-a-kind? hand 2)
+         (n-of-a-kind? hand 3))))
 
 (defn flush?
   [hand]
@@ -58,3 +57,42 @@
 
 (defn pair? [hand]
   (n-of-a-kind? hand 2))
+
+(defn- hand-name->hand-value [hand-name]
+  ({:royal-straight-flush 10
+    :straight-flush 9
+    :four-of-a-kind 8
+    :full-house     7
+    :flush 6
+    :straight 5
+    :three-of-a-kind 4
+    :two-pair 3
+    :pair 2
+    :high-card 1} hand-name))
+
+(defn- eval-full-hand [hand]
+  (if (< (count hand) 5)
+    nil
+    (cond
+     (royal-straight-flush? hand) :royal-straight-flush
+     (straight-flush? hand) :straight-flush
+     (four-of-a-kind? hand) :four-of-a-kind
+     (full-house? hand) :full-house
+     (flush? hand) :flush
+     (straight? hand) :straight)))
+
+(defn eval-hand [hand]
+  (if-let [r (eval-full-hand hand)]
+    r
+    (cond
+     (three-of-a-kind? hand) :three-of-a-kind
+     (two-pair? hand) :two-pair
+     (pair? hand) :pair
+     :else :high-card)))
+
+
+(defn compare-hands [pred hand1 hand2]
+  (letfn [(hand-val [hand]
+                    (hand-name->hand-value
+                     (if (keyword? hand) hand (eval-hand hand))))]
+    (pred (hand-val hand1) (hand-val hand2))))
