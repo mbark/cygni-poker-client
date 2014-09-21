@@ -7,7 +7,7 @@
 (defn- n-of-a-kind? [hand n]
   (not (nil?
         (some (fn [[k v]] (= (count v) n))
-              (group-by-value ex-hand)))))
+              (group-by-value hand)))))
 
 (defn four-of-a-kind?
   [hand]
@@ -28,9 +28,18 @@
 
 (defn straight?
   [hand]
-  (reduce-some
-   #(if (= (inc (:rank %1)) (:rank %2)) %2)
-   (sort-by :rank hand)))
+  (letfn [(ace->one
+           [card]
+           (if (= (:rank card) 14)
+             {:rank 1 :suit (:suit card)}
+             card))
+          (is-straight?
+           [coll]
+           (reduce-some
+            #(if (= (inc %1) %2) %2)
+            (sort (map :rank coll))))]
+    (or (is-straight? hand)
+        (is-straight? (map ace->one hand)))))
 
 (defn straight-flush? [hand]
   (and
