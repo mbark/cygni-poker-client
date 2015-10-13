@@ -21,8 +21,8 @@
 
 (defn has-role? [board player-name role]
   (=
-   (role board)
-   (player board player-name)))
+    (role board)
+    (player board player-name)))
 
 (defn reset-board []
   (reset! board-state
@@ -47,97 +47,97 @@
 
 (defn update-player [player]
   (swap!
-   board-state
-   (fn [m]
-     (update-in m
-                [:players]
-                #(replace-player % player)))))
+    board-state
+    (fn [m]
+      (update-in m
+                 [:players]
+                 #(replace-player % player)))))
 
 (defn update-pot [event amount-key]
   (update-player (:player event))
   (swap!
-   board-state
-   (fn [m]
-     (update-in m
-                [:pot]
-                #(+ % (amount-key event))))))
+    board-state
+    (fn [m]
+      (update-in m
+                 [:pot]
+                 #(+ % (amount-key event))))))
 
 (defn player-folded [player]
   (swap!
-   board-state
-   (fn [m]
-     (update-in m
-                [:currently-playing]
-                #(remove-player % (:name player))))))
+    board-state
+    (fn [m]
+      (update-in m
+                 [:currently-playing]
+                 #(remove-player % (:name player))))))
 
 (defrecord BoardUpdater []
   IEventListener
   (register-for-play-response [this event])
   (play-is-started-event
-   [this event]
-   (reset-board)
-   (swap!
-    board-state
-    #(assoc
-       %
-       :players (:players event)
-       :currently-playing (:players event)
-       :small-blind (:small-blind-amount event)
-       :big-blind (:big-blind-amount event)
-       :dealer (:dealer event)
-       :small-blind-player (:small-blind-player event)
-       :big-blind-player (:big-blind-player event))))
+    [this event]
+    (reset-board)
+    (swap!
+      board-state
+      #(assoc
+         %
+         :players (:players event)
+         :currently-playing (:players event)
+         :small-blind (:small-blind-amount event)
+         :big-blind (:big-blind-amount event)
+         :dealer (:dealer event)
+         :small-blind-player (:small-blind-player event)
+         :big-blind-player (:big-blind-player event))))
   (community-has-been-dealt-a-card-event
-   [this event]
-   (swap!
-    board-state
-    (fn [m]
-      (update-in m
-                 [:community-cards]
-                 #(conj % (:card event))))))
+    [this event]
+    (swap!
+      board-state
+      (fn [m]
+        (update-in m
+                   [:community-cards]
+                   #(conj % (:card event))))))
   (you-have-been-dealt-a-card-event
-   [this event]
-   (swap!
-    board-state
-    (fn [m]
-      (update-in m
-                 [:player-cards]
-                 #(conj % (:card event))))))
+    [this event]
+    (swap!
+      board-state
+      (fn [m]
+        (update-in m
+                   [:player-cards]
+                   #(conj % (:card event))))))
   (player-bet-big-blind-event
-   [this event]
-   (update-pot event :big-blind))
+    [this event]
+    (update-pot event :big-blind))
   (player-bet-small-blind-event
-   [this event]
-   (update-pot event :small-blind))
+    [this event]
+    (update-pot event :small-blind))
   (player-called-event
-   [this event]
-   (update-pot event :call-bet))
+    [this event]
+    (update-pot event :call-bet))
   (player-raised-event
-   [this event]
-   (update-pot event :raise-bet))
+    [this event]
+    (update-pot event :raise-bet))
   (player-went-all-in-event
-   [this event]
-   (update-pot event :all-in-amount))
+    [this event]
+    (update-pot event :all-in-amount))
   (show-down-event
-   [this event])
+    [this event])
   (table-changed-state-event
-   [this event]
-   (swap!
-    board-state
-    #(assoc % :turn (:state event))))
+    [this event]
+    (swap!
+      board-state
+      #(assoc % :turn (:state event))))
   (table-is-done-event
-   [this event])
+    [this event])
   (player-checked-event [this event])
   (player-folded-event
-   [this event]
-   (player-folded (:player event)))
+    [this event]
+    (player-folded (:player event)))
   (player-forced-folded-event
-   [this event]
-   (player-folded (:player event)))
+    [this event]
+    (player-folded (:player event)))
   (player-quit-event [this event])
   (server-is-shutting-down-event [this event])
   (you-won-amount-event
-   [this event]
-   (swap!
-    board-state
-    #(assoc % :player-chips (:your-chip-amount event)))))
+    [this event]
+    (swap!
+      board-state
+      #(assoc % :player-chips (:your-chip-amount event)))))

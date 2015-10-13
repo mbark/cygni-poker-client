@@ -22,14 +22,14 @@
      (let [character (.read in)]
        (if (>= character 0)
          (read-till-delimiter
-          in
-          delimiter
-          (str input (char character))))))))
+           in
+           delimiter
+           (str input (char character))))))))
 
 (defn send-msg [conn msg]
   (write
-   conn
-   (str msg json-delimiter)))
+    conn
+    (str msg json-delimiter)))
 
 (defn read-msg [conn]
   (try

@@ -10,10 +10,10 @@
 
 (defn- event-class [data]
   (->kebab-case
-   (last
-    (clojure.string/split
-     (:type data)
-     #"\."))))
+    (last
+      (clojure.string/split
+        (:type data)
+        #"\."))))
 
 (defn- named-rank->num [k v]
   (if (and (string? v) (= k :rank))
@@ -44,18 +44,18 @@
 
 (defn event? [msg]
   (not (or
-        (request? msg)
-        (exception? msg))))
+         (request? msg)
+         (exception? msg))))
 
 (defn action-response [request action]
   (->str
-   {:type "se.cygni.texasholdem.communication.message.response.ActionResponse"
-    :requestId (:request-id request)
-    :action action}))
+    {:type "se.cygni.texasholdem.communication.message.response.ActionResponse"
+     :requestId (:request-id request)
+     :action action}))
 
 (defn register-for-play [bot-name]
   (->str
-   {:type "se.cygni.texasholdem.communication.message.request.RegisterForPlayRequest"
-    :sessionId ""
-    :name bot-name
-    :room "TRAINING"}))
+    {:type "se.cygni.texasholdem.communication.message.request.RegisterForPlayRequest"
+     :sessionId ""
+     :name bot-name
+     :room "TRAINING"}))
