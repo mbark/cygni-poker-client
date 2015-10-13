@@ -68,7 +68,7 @@
 (defn pair? [hand]
   (n-of-a-kind? hand 2))
 
-(defn- hand-name->hand-value [hand-name]
+(defn hand-rank [hand-name]
   ({:royal-straight-flush 10
     :straight-flush 9
     :four-of-a-kind 8
@@ -100,13 +100,16 @@
      (pair? hand) :pair
      :else :high-card)))
 
-(defn best-hand [& cards]
-  (letfn [(hand-val [hand] (hand-name->hand-value (eval-hand hand)))]
-    (reduce
-     #(if (> (hand-val %2) (hand-val %1))
-        %2
-        %1)
-     (combo/combinations (apply concat cards) 5))))
+(defn best-hand [& l]
+  (let [cards (apply concat l)]
+    (if (<= (count cards) 5)
+      cards
+      (letfn [(hand-val [hand] (hand-rank (eval-hand hand)))]
+        (reduce
+         #(if (> (hand-val %2) (hand-val %1))
+            %2
+            %1)
+         (combo/combinations cards 5))))))
 
 (defn- highest-card [hand]
   (reduce #(if (> (:rank %2) (:rank %1)) %2 %1) hand))
@@ -120,7 +123,7 @@
 (defn compare-hands [pred hand1 hand2]
   (:pre [(keyword? hand1) (keyword? hand2)])
   (letfn [(hand-val [hand]
-                    (hand-name->hand-value (eval-hand hand)))]
+                    (hand-rank (eval-hand hand)))]
     (if (pred (hand-val hand1) (hand-val hand2))
       true
       (let [card1 (highest-card hand1)

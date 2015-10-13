@@ -84,3 +84,10 @@
          (best-hand
           [{:rank 14, :suit "CLUBS"} {:rank 8, :suit "DIAMONDS"}]
           [{:rank 14, :suit "DIAMONDS"} {:rank 14, :suit "HEARTS"} {:rank 7, :suit "DIAMONDS"} {:rank 8, :suit "HEARTS"}])))))
+
+(deftest test-best-hand-too-few
+  (testing "Best hand with less than 5 cards"
+    (is (=
+         [{:rank 2, :suit "CLUBS"} {:rank 2, :suit "DIAMONDS"} {:rank 3, :suit "DIAMONDS"}]
+         (best-hand
+          [{:rank 2, :suit "CLUBS"} {:rank 2, :suit "DIAMONDS"} {:rank 3, :suit "DIAMONDS"}])))))
