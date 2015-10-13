@@ -19,7 +19,7 @@
     (debug (str "Current board " (current-board)))
     (let [actions (:possible-actions request)
           response (nth actions (rand-int (count actions)))]
-      (info (str "Responding with " response))
+      (info (str "Responding with " response " to actions " actions))
       response))
   (register-for-play-response
     [this event])

@@ -65,14 +65,22 @@
          false (compare-hands > (:pair hands) (:two-pair hands))
          true (compare-hands = (:pair hands) (:pair hands))
          true (compare-hands
-                >
-                [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 2} {:suit "HEARTS" :rank 5} {:suit "DIAMONDS" :rank 6} {:suit "DIAMONDS" :rank 11}]
-                [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 2} {:suit "HEARTS" :rank 5} {:suit "DIAMONDS" :rank 6} {:suit "DIAMONDS" :rank 10}])
+               >
+               [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 2} {:suit "HEARTS" :rank 5} {:suit "DIAMONDS" :rank 6} {:suit "DIAMONDS" :rank 11}]
+               [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 2} {:suit "HEARTS" :rank 5} {:suit "DIAMONDS" :rank 6} {:suit "DIAMONDS" :rank 10}])
          true (compare-hands
-                >
-                [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 2} {:suit "HEARTS" :rank 5} {:suit "DIAMONDS" :rank 6} {:suit "SPADES" :rank 10}]
-                [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 2} {:suit "HEARTS" :rank 5} {:suit "DIAMONDS" :rank 6} {:suit "HEARTS" :rank 10}])
+               >
+               [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 2} {:suit "HEARTS" :rank 5} {:suit "DIAMONDS" :rank 6} {:suit "SPADES" :rank 10}]
+               [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 2} {:suit "HEARTS" :rank 5} {:suit "DIAMONDS" :rank 6} {:suit "HEARTS" :rank 10}])
          true (compare-hands
-                =
-                [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 2} {:suit "HEARTS" :rank 5} {:suit "DIAMONDS" :rank 6} {:suit "HEARTS" :rank 10}]
-                [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 2} {:suit "HEARTS" :rank 5} {:suit "DIAMONDS" :rank 6} {:suit "HEARTS" :rank 10}]))))
+               =
+               [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 2} {:suit "HEARTS" :rank 5} {:suit "DIAMONDS" :rank 6} {:suit "HEARTS" :rank 10}]
+               [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 2} {:suit "HEARTS" :rank 5} {:suit "DIAMONDS" :rank 6} {:suit "HEARTS" :rank 10}]))))
+
+(deftest test-best-hand
+  (testing "Best hand"
+    (is (=
+         [{:rank 14, :suit "CLUBS"} {:rank 8, :suit "DIAMONDS"} {:rank 14, :suit "DIAMONDS"} {:rank 14, :suit "HEARTS"} {:rank 8, :suit "HEARTS"}]
+         (best-hand
+          [{:rank 14, :suit "CLUBS"} {:rank 8, :suit "DIAMONDS"}]
+          [{:rank 14, :suit "DIAMONDS"} {:rank 14, :suit "HEARTS"} {:rank 7, :suit "DIAMONDS"} {:rank 8, :suit "HEARTS"}])))))
