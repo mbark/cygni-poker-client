@@ -99,9 +99,23 @@
      (pair? hand) :pair
      :else :high-card)))
 
+(defn- highest-card [hand]
+  (reduce #(if (> (:rank %2) (:rank %1)) %2 %1) hand))
+
+(defn- suit-rank [card]
+  (get {"SPADES" 4
+  "HEARTS" 3
+  "DIAMONDS" 2
+  "CLUBS" 1} (:suit card)))
 
 (defn compare-hands [pred hand1 hand2]
+  (:pre [(keyword? hand1) (keyword? hand2)])
   (letfn [(hand-val [hand]
-                    (hand-name->hand-value
-                     (if (keyword? hand) hand (eval-hand hand))))]
-    (pred (hand-val hand1) (hand-val hand2))))
+                    (hand-name->hand-value (eval-hand hand)))]
+    (if (pred (hand-val hand1) (hand-val hand2))
+      true
+      (let [card1 (highest-card hand1)
+            card2 (highest-card hand2)]
+        (if (pred (:rank card1) (:rank card2))
+          true
+            (pred (suit-rank card1) (suit-rank card2)))))))
