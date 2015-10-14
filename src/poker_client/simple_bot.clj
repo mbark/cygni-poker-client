@@ -14,13 +14,13 @@
 (defn -main []
   (client/start {:name "poker.cygni.se" :port 4711} (->SimpleBot)))
 
-(defn- actions->map [actions]
+(defn- actions->keyword-map [actions]
   (into {}
         (map
          (fn [action] [(->kebab-case-keyword (:action-type action)) action])
          actions)))
 
-(defn- i-am-small-blind? [board]
+(defn- am-i-small-blind? [board]
   (=
    bot-name
    (:name (:small-blind-player board))))
@@ -29,21 +29,19 @@
   (let [cards [(:community-cards board) (:player-cards board)]
         hand (best-hand cards)
         rank (hand-rank (eval-hand hand))
-        actions (actions->map (:possible-actions request))]
+        actions (actions->keyword-map (:possible-actions request))
+        better-than? (fn [hand-name] (> rank (hand-rank hand-name)))
+        can-do? (fn [action] (contains? actions action))]
     ((cond
-      (and (> rank (hand-rank :three-of-a-kind))
-           (contains? actions :all-in))
+      (and (better-than? :three-of-a-kind) (can-do? :all-in))
       :all-in
-      (contains? actions :check)
+      (can-do? :check)
       :check
-      (and (> rank (hand-rank :pair))
-           (contains? actions :call))
+      (and (better-than? :pair) (can-do? :call))
       :call
-      (and (> rank (hand-rank :two-pair))
-           (contains? actions :raise))
+      (and (better-than? :two-pair) (can-do? :raise))
       :raise
-      (and (i-am-small-blind? board)
-           (= (:turn board) "PRE_FLOP"))
+      (and (am-i-small-blind? board) (= (:turn board) "PRE_FLOP"))
       :call
       :else :fold) actions)))
 
@@ -52,10 +50,10 @@
   (bot-name [_] bot-name)
   (play
    [this request]
-   (debug (str "Bot received request " request))
-   (debug (str "Current board " (current-board)))
+   (debug "Bot received request " request)
+   (debug "Current board " (current-board))
    (let [response (play (current-board) request)]
-     (info (str "Responding with " response " to " request))
+     (info "Responding with " response " to " request)
      response))
   (register-for-play-response
    [this event])
