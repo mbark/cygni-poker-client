@@ -12,7 +12,7 @@
 (declare ->SimpleBot)
 
 (defn -main []
-  (client/start {:name "poker.cygni.se" :port 4711} (->SimpleBot)))
+  (client/start {:name "localhost" :port 4711} (->SimpleBot)))
 
 (defn- actions->keyword-map [actions]
   (into {}

@@ -6,8 +6,7 @@
   {:pair [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 2} {:suit "HEARTS" :rank 5} {:suit "DIAMONDS" :rank 6} {:suit "DIAMONDS" :rank 10}]
    :two-pair [{:suit "CLUBS" :rank 2} {:suit "HEARTS" :rank 2} {:suit "SPADES" :rank 3} {:suit "DIAMONDS" :rank 3} {:suit "DIAMONDS" :rank 11}]
    :three-of-a-kind [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 2} {:suit "HEARTS" :rank 2} {:suit "SPADES" :rank 3} {:suit "DIAMONDS" :rank 10}]
-   :straight [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 3} {:suit "HEARTS" :rank 4} {:suit "HEARTS" :rank 5} {:suit "HEARTS" :rank 6}]
-   :straight-with-ace [{:suit "CLUBS" :rank 14} {:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 3} {:suit "HEARTS" :rank 4} {:suit "HEARTS" :rank 5}]
+   :straight [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 3} {:suit "HEARTS" :rank 4} {:suit "HEARTS" :rank 5} {:suit "HEARTS" :rank 14}]
    :flush [{:suit "CLUBS" :rank 8} {:suit "CLUBS" :rank 3} {:suit "CLUBS" :rank 4} {:suit "CLUBS" :rank 5} {:suit "CLUBS" :rank 6}]
    :full-house [{:suit "CLUBS" :rank 2} {:suit "SPADES" :rank 2} {:suit "HEARTS" :rank 4} {:suit "HEARTS" :rank 4} {:suit "DIAMONDS" :rank 4}]
    :four-of-a-kind [{:suit "CLUBS" :rank 3} {:suit "SPADES" :rank 3} {:suit "HEARTS" :rank 3} {:suit "DIAMONDS" :rank 3} {:suit "HEARTS" :rank 6}]
@@ -32,10 +31,6 @@
 
 (deftest test-straight
   (testing "Straight"
-    (find-and-eval :straight)))
-
-(deftest test-straight-with-ace
-  (testing "Straight with an ace counted as 1"
     (find-and-eval :straight)))
 
 (deftest test-flush
